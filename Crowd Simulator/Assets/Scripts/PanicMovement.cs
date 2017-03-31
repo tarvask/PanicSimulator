@@ -6,7 +6,14 @@ public class PanicMovement : MonoBehaviour
 	public float m_Radius;
 	public float m_Angle;
 	public float m_BrownPeriod;
-	public float m_EscapeThinkPeriod;
+	public float m_EscapeThinkPeriod = 0.5f;
+    public float m_EscapeSpeed = 1f;
+
+    // two numbers, that describe the proportions of fear/escape movements
+    public float m_FearCoeff = 2f;
+    public float m_EscapeCoeff = 1.2f;
+
+    public Rigidbody m_Body;
 
 	Vector3 m_PrevBrownTarget;
 	Vector3 m_NextBrownTarget;
@@ -14,24 +21,42 @@ public class PanicMovement : MonoBehaviour
 	Vector3 m_AtomicBrownBackMovement;
 
 	Vector3 m_EscapeTarget;
-	Vector3 m_EscapeMovement;
+    Vector3 m_EscapeDirection;
+
+    Vector3 m_PanicDirection;
 
 	float m_BrownTimer;
+    float m_CurrentBrownPeriod;
 	float m_EscapeThinkTimer;
+    float m_PanicThinkTimer;
 
 	// Use this for initialization
 	void Start ()
 	{
+        // move center of mass to the bottom to simulate vanka-vstanka
+        m_Body.centerOfMass = new Vector3(0, -1, 0);
+
 		GetNewBrownianTarget ();
-		GetNewEscapeTarget ();
+        UpdateEscapeDirection ();
 	}
 	
 	// Update is called once per frame
-	void Update ()
+	void FixedUpdate ()
 	{
-		transform.localPosition += (GetBrownMovement() + GetEscapeMovement());
-		m_BrownTimer -= Time.deltaTime;
-		m_EscapeThinkTimer -= Time.deltaTime;
+        // get escape and panic directions, compute them with corresponding coeffs
+        Vector3 panicDirection = GetCurrentPanicDirection();
+        Vector3 escapeDirection = GetCurrentEscapeDirection();
+        Vector3 sanityDirection = (panicDirection * m_FearCoeff + escapeDirection * m_EscapeCoeff).normalized;
+
+        // multiply direction by speed
+        Vector3 sanityMovement = sanityDirection * Time.fixedDeltaTime * m_EscapeSpeed;
+        transform.localPosition += GetBrownMovement();
+        transform.localPosition += sanityMovement;
+
+        // update timers
+		m_BrownTimer -= Time.fixedDeltaTime;
+        m_EscapeThinkTimer -= Time.fixedDeltaTime;
+        m_PanicThinkTimer -= Time.fixedDeltaTime;
 	}
 
 	void GetNewBrownianTarget()
@@ -44,27 +69,33 @@ public class PanicMovement : MonoBehaviour
 
 		// turn to new position
 		float angle = Random.Range(-m_Angle, m_Angle);
-		nextTransform.RotateAround (Vector3.zero, Vector3.up, angle);
+        nextTransform.RotateAround (nextTransform.position, Vector3.up, angle);
 
 		// move to new position
-		float delta = Random.Range(0, m_Radius);
-		nextTransform.localPosition += transform.forward * delta;
+        float delta = Random.Range(m_Radius / 2, m_Radius);
+        nextTransform.localPosition += nextTransform.forward.normalized * delta;
 
 		// update targets
-		m_PrevBrownTarget = transform.localPosition;
-		m_NextBrownTarget = new Vector3(nextTransform.localPosition.x, transform.localPosition.y, nextTransform.localPosition.z);
+        m_PrevBrownTarget = Vector3.zero;
+		m_NextBrownTarget = new Vector3(nextTransform.localPosition.x, 0, nextTransform.localPosition.z);
+
+        // take random brown period near given brown period
+        m_CurrentBrownPeriod = Random.Range(m_BrownPeriod / 2, m_BrownPeriod * 3 / 2);
 
 		// half period for one-side movement
-		m_AtomicBrownForwardMovement = (m_NextBrownTarget - m_PrevBrownTarget) / (m_BrownPeriod / 2) * Time.deltaTime;
-		m_AtomicBrownBackMovement = (m_PrevBrownTarget - m_NextBrownTarget) / (m_BrownPeriod / 2) * Time.deltaTime;
+        m_AtomicBrownForwardMovement = m_NextBrownTarget / (m_CurrentBrownPeriod / 2) * Time.fixedDeltaTime;
+        m_AtomicBrownBackMovement = -m_AtomicBrownForwardMovement;
 
 		// drop timer
-		m_BrownTimer = m_BrownPeriod;
+        m_BrownTimer = m_CurrentBrownPeriod;
+
+        // delete unneeded object
+        Destroy(nextTransformGO);
 	}
 
 	Vector3 GetBrownMovement()
 	{
-		if (m_BrownTimer > m_BrownPeriod / 2)
+        if (m_BrownTimer > m_CurrentBrownPeriod / 2)
 		{
 			return m_AtomicBrownForwardMovement;
 		}
@@ -79,25 +110,67 @@ public class PanicMovement : MonoBehaviour
 		}
 	}
 
-	void GetNewEscapeTarget()
+	void UpdateEscapeDirection()
 	{
 		// get new target
 		m_EscapeTarget = PanicManager.Instance.m_EscapePoint.transform.localPosition;
+        m_EscapeTarget.y = transform.localPosition.y;
 
 		// get movement
-		m_EscapeMovement = ( - transform.localPosition) / (m_BrownPeriod / 2) * Time.deltaTime;
+        m_EscapeDirection = m_EscapeTarget - transform.localPosition;
+
+        // do not waste movement on vertical axis
+        m_EscapeDirection.y = 0;
+        m_EscapeDirection.Normalize();
+
+        // droptimer
+        m_EscapeThinkTimer = Random.Range(m_EscapeThinkPeriod - 0.15f, m_EscapeThinkPeriod + 0.15f);
 	}
 
-	Vector3 GetEscapeMovement()
+    void UpdatePanicDirection()
+    {
+        Vector3 currentPosition = transform.localPosition;
+        PanicPoint[] panicPoints = PanicManager.Instance.GetPanicPointsInLocation(currentPosition);
+        m_PanicDirection = Vector3.zero;
+
+        for (int i = 0; i < panicPoints.Length; i++)
+        {
+            // if point is near enough to fear it
+            if (true)
+            {
+                m_PanicDirection += (currentPosition - panicPoints[i].transform.localPosition) * panicPoints[i].m_FearStrength;
+            }
+        }
+
+        m_PanicDirection.Normalize();
+
+        // droptimer
+        m_PanicThinkTimer = Random.Range(m_EscapeThinkPeriod - 0.15f, m_EscapeThinkPeriod + 0.15f);
+    }
+
+	Vector3 GetCurrentEscapeDirection()
 	{
 		if (m_EscapeThinkTimer > 0)
 		{
-			return m_EscapeMovement;
+            return m_EscapeDirection;
 		}
 		else
 		{
-			GetNewEscapeTarget ();
+            UpdateEscapeDirection ();
 			return Vector3.zero;
 		}
 	}
+
+    Vector3 GetCurrentPanicDirection()
+    {
+        if (m_PanicThinkTimer > 0)
+        {
+            return m_PanicDirection;
+        }
+        else
+        {
+            UpdatePanicDirection ();
+            return Vector3.zero;
+        }
+    }
 }
