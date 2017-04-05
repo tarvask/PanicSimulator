@@ -13,6 +13,8 @@ public class PanicMovement : MonoBehaviour
     public float m_FearCoeff = 2f;
     public float m_EscapeCoeff = 1.2f;
 
+    public float m_ViewRadius = 5f;
+
     public Rigidbody m_Body;
 
 	Vector3 m_PrevBrownTarget;
@@ -130,7 +132,7 @@ public class PanicMovement : MonoBehaviour
     void UpdatePanicDirection()
     {
         Vector3 currentPosition = transform.localPosition;
-        PanicPoint[] panicPoints = PanicManager.Instance.GetPanicPointsInLocation(currentPosition);
+        PanicPoint[] panicPoints = PanicManager.Instance.GetPanicPointsInLocation(currentPosition, m_ViewRadius);
         m_PanicDirection = Vector3.zero;
 
         for (int i = 0; i < panicPoints.Length; i++)
