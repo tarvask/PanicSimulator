@@ -4,7 +4,15 @@ using System.Collections;
 public class CrowdSpawner : MonoBehaviour
 {
     public Transform m_SpawnContainer;
-    public Transform m_SpawnPoint;
+    
+	// point to spawn around
+	public Transform m_SpawnPoint;
+
+	// describes spawn circle
+	public float m_SpawnRadius;
+
+	// angle step after each spawn
+	public int m_SpawnAngleStep;
 
     // overall count of crowders
     public int m_CrowdersToSpawn;
@@ -35,7 +43,13 @@ public class CrowdSpawner : MonoBehaviour
             {
                 if (choice < m_CrowdersProbabilities[k])
                 {
-                    SpawnType(m_CrowdersTypes[k]);
+					Transform newPoint = new GameObject().transform;
+					newPoint.parent = m_SpawnContainer;
+					newPoint.localPosition = m_SpawnPoint.localPosition + m_SpawnPoint.forward * Random.Range (m_SpawnRadius / 2, m_SpawnRadius);
+					newPoint.RotateAround (m_SpawnPoint.localPosition, Vector3.up, m_SpawnAngleStep*j);
+
+					SpawnType(m_CrowdersTypes[k], newPoint.localPosition);
+					Destroy (newPoint.gameObject);
                     break;
                 }
                 else
@@ -46,10 +60,11 @@ public class CrowdSpawner : MonoBehaviour
         }
     }
 
-    void SpawnType(GameObject typePrefab)
+	void SpawnType(GameObject typePrefab, Vector3 position)
     {
         GameObject crowder = Instantiate(typePrefab, m_SpawnContainer) as GameObject;
         crowder.transform.localScale = Vector3.one;
-        crowder.transform.localPosition = m_SpawnPoint.localPosition;
+		crowder.transform.localPosition = position;
+		Debug.Log (position.ToString ());
     }
 }

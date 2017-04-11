@@ -47,7 +47,7 @@ public class PanicMovement : MonoBehaviour
 	{
         // get escape and panic directions, compute them with corresponding coeffs
         Vector3 panicDirection = GetCurrentPanicDirection();
-        Vector3 escapeDirection = GetCurrentEscapeDirection();
+		Vector3 escapeDirection = Vector3.zero; //GetCurrentEscapeDirection(); now crowders are totally ruled by fear
         Vector3 sanityDirection = (panicDirection * m_FearCoeff + escapeDirection * m_EscapeCoeff).normalized;
 
         // multiply direction by speed
@@ -99,11 +99,11 @@ public class PanicMovement : MonoBehaviour
 	{
         if (m_BrownTimer > m_CurrentBrownPeriod / 2)
 		{
-			return m_AtomicBrownForwardMovement;
+			return m_AtomicBrownForwardMovement * Mathf.Sin (Mathf.PI * m_BrownTimer / (m_CurrentBrownPeriod * 2));
 		}
 		else if (m_BrownTimer > 0)
 		{
-			return m_AtomicBrownBackMovement;
+			return m_AtomicBrownBackMovement * Mathf.Sin (Mathf.PI * m_BrownTimer / m_CurrentBrownPeriod);
 		}
 		else
 		{
@@ -137,11 +137,7 @@ public class PanicMovement : MonoBehaviour
 
         for (int i = 0; i < panicPoints.Length; i++)
         {
-            // if point is near enough to fear it
-            if (true)
-            {
-                m_PanicDirection += (currentPosition - panicPoints[i].transform.localPosition) * panicPoints[i].m_FearStrength;
-            }
+            m_PanicDirection += (currentPosition - panicPoints[i].transform.localPosition) * panicPoints[i].m_FearStrength;
         }
 
         m_PanicDirection.Normalize();
