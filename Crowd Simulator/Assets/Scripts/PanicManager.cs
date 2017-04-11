@@ -4,13 +4,16 @@ using System.Collections.Generic;
 
 public class PanicManager : Singleton<PanicManager>
 {
+    public CrowdSpawner m_Spawner;
+
 	public GameObject m_EscapePoint;
 
     public PanicPoint[] m_PanicPoints;
 
 	// Use this for initialization
-	void Start () {
-	
+	void Start ()
+    {
+        m_Spawner.Spawn();
 	}
 	
 	// Update is called once per frame
