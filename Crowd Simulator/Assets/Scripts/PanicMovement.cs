@@ -140,6 +140,7 @@ public class PanicMovement : MonoBehaviour
             m_PanicDirection += (currentPosition - panicPoints[i].transform.localPosition) * panicPoints[i].m_FearStrength;
         }
 
+        m_PanicDirection.y = 0;
         m_PanicDirection.Normalize();
 
         // droptimer

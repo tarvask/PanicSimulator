@@ -46,7 +46,7 @@ public class CrowdSpawner : MonoBehaviour
 					Transform newPoint = new GameObject().transform;
 					newPoint.parent = m_SpawnContainer;
 					newPoint.localPosition = m_SpawnPoint.localPosition + m_SpawnPoint.forward * Random.Range (m_SpawnRadius / 2, m_SpawnRadius);
-					newPoint.RotateAround (m_SpawnPoint.localPosition, Vector3.up, m_SpawnAngleStep*j);
+                    newPoint.RotateAround (m_SpawnPoint.position, Vector3.up, m_SpawnAngleStep*j);
 
 					SpawnType(m_CrowdersTypes[k], newPoint.localPosition);
 					Destroy (newPoint.gameObject);
