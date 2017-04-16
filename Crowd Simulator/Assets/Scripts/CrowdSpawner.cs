@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class CrowdSpawner : MonoBehaviour
 {
@@ -22,6 +23,9 @@ public class CrowdSpawner : MonoBehaviour
 
     // probabilities of crowder types by their weights
     public int[] m_CrowdersProbabilities;
+
+    [System.NonSerialized]
+    public List<GameObject> m_Crowders = new List<GameObject>();
 
     public void Spawn()
     {
@@ -65,6 +69,6 @@ public class CrowdSpawner : MonoBehaviour
         GameObject crowder = Instantiate(typePrefab, m_SpawnContainer) as GameObject;
         crowder.transform.localScale = Vector3.one;
 		crowder.transform.localPosition = position;
-		Debug.Log (position.ToString ());
+        m_Crowders.Add(crowder);
     }
 }

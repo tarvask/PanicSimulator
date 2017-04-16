@@ -16,6 +16,7 @@ public class PanicMovement : MonoBehaviour
     public float m_ViewRadius = 5f;
 
     public Rigidbody m_Body;
+    public CapsuleCollider m_Collider;
 
 	Vector3 m_PrevBrownTarget;
 	Vector3 m_NextBrownTarget;
@@ -38,9 +39,17 @@ public class PanicMovement : MonoBehaviour
         // move center of mass to the bottom to simulate vanka-vstanka
         m_Body.centerOfMass = new Vector3(0, -1, 0);
 
+//        m_Collider.isTrigger = true;
+
 		GetNewBrownianTarget ();
 //        UpdateEscapeDirection ();
 	}
+
+    void OnTriggerEnter()
+    {
+        int s = 0;
+        s++;
+    }
 	
 	// Update is called once per frame
 	void FixedUpdate ()
