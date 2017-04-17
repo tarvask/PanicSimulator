@@ -7,17 +7,17 @@ public class ChaserMovement : MonoBehaviour
     public float m_VictimThinkPeriod = 1.0f;
     public float m_ChaserSpeed = 1.4f;
 
-    public Rigidbody m_Body;
+    public Disease m_Disease;
 
     GameObject m_Victim;
 
     float m_VictimThinkTimer;
 
 	// Use this for initialization
-	void Start ()
+	public void Init ()
     {
         // move center of mass to the bottom to simulate vanka-vstanka
-        m_Body.centerOfMass = new Vector3(0, -1, 0);
+        m_Disease.m_Body.centerOfMass = new Vector3(0, -1, 0);
 
         UpdateVictimTarget ();
 	}

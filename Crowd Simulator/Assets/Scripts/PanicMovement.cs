@@ -45,7 +45,7 @@ public class PanicMovement : MonoBehaviour
 //        UpdateEscapeDirection ();
 	}
 
-    void OnTriggerEnter()
+    void OnCollisionEnter(Collision other)
     {
         int s = 0;
         s++;

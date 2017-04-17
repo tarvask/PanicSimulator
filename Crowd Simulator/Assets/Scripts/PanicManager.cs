@@ -6,26 +6,32 @@ public class PanicManager : Singleton<PanicManager>
 {
     public CrowdSpawner m_Spawner;
 
+    public GameObject m_Diseased;
+
+    public Material m_DiseaseMaterial;
+
 	public GameObject m_EscapePoint;
 
-    public PanicPoint[] m_PanicPoints;
+    public List<PanicPoint> m_PanicPoints;
+
+    public List<ChaserMovement> m_Chasers;
 
 	// Use this for initialization
 	void Start ()
     {
         m_Spawner.Spawn();
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
+
+        foreach (ChaserMovement chaser in m_Chasers)
+        {
+            chaser.Init();
+        }
 	}
 
     public PanicPoint[] GetPanicPointsInLocation(Vector3 crowderPosition, float radius)
     {
         List<PanicPoint> resultPoints = new List<PanicPoint>();
 
-        for (int i = 0; i < m_PanicPoints.Length; i++)
+        for (int i = 0; i < m_PanicPoints.Count; i++)
         {
             if (Vector3.Distance(m_PanicPoints[i].transform.localPosition, crowderPosition) < radius)
             {
