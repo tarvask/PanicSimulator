@@ -35,7 +35,8 @@ public class ChaserMovement : MonoBehaviour
             victimDirection.Normalize();
 
             Vector3 chaseMovement = victimDirection * Time.fixedDeltaTime * m_ChaserSpeed;
-            transform.localPosition += chaseMovement;
+            m_Disease.m_Body.MovePosition(transform.position + chaseMovement);
+//            transform.localPosition += chaseMovement;
         }
 
         // update timers
@@ -53,12 +54,16 @@ public class ChaserMovement : MonoBehaviour
         // find the closest crowder that can be seen
         for (int i = 0; i < allVictims.Length; i++)
         {
-            float curDistance = Vector3.Distance(allVictims[i].transform.localPosition, currentPosition);
-
-            if (curDistance < m_ViewRadius && curDistance < minDistance)
+            // check in case of diseased
+            if (allVictims[i] != null)
             {
-                minDistance = curDistance;
-                victim = allVictims[i];
+                float curDistance = Vector3.Distance(allVictims[i].transform.localPosition, currentPosition);
+
+                if (curDistance < m_ViewRadius && curDistance < minDistance)
+                {
+                    minDistance = curDistance;
+                    victim = allVictims[i];
+                }
             }
         }
 

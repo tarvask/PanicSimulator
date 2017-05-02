@@ -25,7 +25,7 @@ public class Disease : MonoBehaviour
         PanicManager panicManager = PanicManager.Instance;
 
         // get real behaviour carrier
-        GameObject crowderBehaviourGO = crowderBody.transform.parent.gameObject;
+        GameObject crowderBehaviourGO = crowderBody.transform.gameObject;
 
         // cash crowder position
         Vector3 crowderPos = crowderBehaviourGO.transform.localPosition;
@@ -40,8 +40,8 @@ public class Disease : MonoBehaviour
 
         ChaserMovement chaserBehaviour = zombi.GetComponent<ChaserMovement>();
 
-        PanicManager.Instance.m_Chasers.Add(chaserBehaviour);
-        PanicManager.Instance.m_PanicPoints.Add(chaserBehaviour.GetComponent<PanicPoint>());
+        panicManager.m_Chasers.Add(chaserBehaviour);
+        panicManager.m_PanicPoints.Add(chaserBehaviour.GetComponent<PanicPoint>());
         chaserBehaviour.Init();
     }
 
