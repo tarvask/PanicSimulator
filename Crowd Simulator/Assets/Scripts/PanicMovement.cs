@@ -39,17 +39,9 @@ public class PanicMovement : MonoBehaviour
         // move center of mass to the bottom to simulate vanka-vstanka
         m_Body.centerOfMass = new Vector3(0, -1, 0);
 
-//        m_Collider.isTrigger = true;
-
 		GetNewBrownianTarget ();
 //        UpdateEscapeDirection ();
 	}
-
-    void OnCollisionEnter(Collision other)
-    {
-        int s = 0;
-        s++;
-    }
 	
 	// Update is called once per frame
 	void FixedUpdate ()
@@ -61,8 +53,11 @@ public class PanicMovement : MonoBehaviour
 
         // multiply direction by speed
         Vector3 sanityMovement = sanityDirection * Time.fixedDeltaTime * m_EscapeSpeed;
-        transform.localPosition += GetBrownMovement();
-        transform.localPosition += sanityMovement;
+
+        // move body
+//        transform.localPosition += GetBrownMovement();
+//        transform.localPosition += sanityMovement;
+        m_Body.MovePosition(transform.position + GetBrownMovement() + sanityMovement);
 
         // update timers
 		m_BrownTimer -= Time.fixedDeltaTime;
