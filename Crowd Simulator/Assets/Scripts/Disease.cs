@@ -34,7 +34,7 @@ public class Disease : MonoBehaviour
         panicManager.m_Spawner.m_Crowders.Remove(crowderBehaviourGO);
         Destroy(crowderBehaviourGO);
 
-        GameObject zombi = Instantiate(panicManager.m_Diseased, transform.parent.parent) as GameObject;
+        GameObject zombi = Instantiate(panicManager.m_DiseasedPrefab, panicManager.m_DiseasedContainer) as GameObject;
         zombi.transform.localScale = Vector3.one;
         zombi.transform.localPosition = crowderPos;
 

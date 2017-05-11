@@ -6,7 +6,9 @@ public class PanicManager : Singleton<PanicManager>
 {
     public CrowdSpawner m_Spawner;
 
-    public GameObject m_Diseased;
+    public GameObject m_DiseasedPrefab;
+
+    public Transform m_DiseasedContainer;
 
     public Material m_DiseaseMaterial;
 
